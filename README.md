@@ -7,6 +7,7 @@
   5341, which Railway's healthcheck never dials.
 - Seeds the `admin` login from `SEQ_ADMIN_PASSWORD` and one API key (`railway-agent`, permissions
   Ingest, Read, Write) from `SEQ_API_KEY` on first boot, before the server is reachable.
+- Turns on "require an API key for writing events", so a public URL cannot be used for anonymous ingestion.
 - Data lives in `/data` (mount a volume there).
 - Sets `ACCEPT_EULA=Y`: running this image is acceptance of the
   [Seq EULA](https://datalust.co/doc/eula-current.pdf). Seq runs free for a single user; more users

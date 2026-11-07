@@ -53,6 +53,15 @@ provision() {
     echo "[boot] admin login failed, API key not seeded: $(printf '%s' "$body" | head -c 200)" >&2
     return 1
   fi
+  # Anonymous ingestion is on by default; with a public URL anyone could fill the volume.
+  code="$(curl -sS -o /tmp/setting.out -w '%{http_code}' -b "$jar" -X PUT "$base/api/settings/setting-requireapikeyforwritingevents" \
+    -H 'Content-Type: application/json' -H "X-Seq-CsrfToken: $csrf" \
+    --data '{"Name":"requireapikeyforwritingevents","Value":true,"Id":"setting-requireapikeyforwritingevents"}')"
+  if [ "$code" != "200" ]; then
+    echo "[boot] could not require an API key for ingestion ($code): $(head -c 300 /tmp/setting.out)" >&2
+    return 1
+  fi
+  echo "[boot] ingestion requires an API key"
   if curl -sS -b "$jar" "$base/api/apikeys" -H "X-Seq-CsrfToken: $csrf" | grep -q "\"TokenPrefix\":\"${SEQ_API_KEY:0:4}\""; then
     echo "[boot] API key already present"
     return 0
